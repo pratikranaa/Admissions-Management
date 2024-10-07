@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcript Verifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Transcript Verifier</h1>
+        <form id="uploadForm">
+            <div class="file-input">
+                <label for="transcripts">Upload Transcripts Folder:</label>
+                <input type="file" id="transcripts" name="transcripts" webkitdirectory directory multiple>
+            </div>
+            <div class="file-input">
+                <label for="forms">Upload Forms Folder:</label>
+                <input type="file" id="forms" name="forms" webkitdirectory directory multiple>
+            </div>
+            <button type="submit">Verify</button>
+        </form>
+        <div id="progress-container" style="display: none;">
+            <div id="progress-bar">
+                <div id="progress-bar-fill"></div>
+            </div>
+            <p id="progress-text"></p>
+        </div>
+        <div id="response">
+            <h2>Verification Results</h2>
+	    <button id="exportCSV" style="display: none;">Export to CSV</button>
+            <div id="results"></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
