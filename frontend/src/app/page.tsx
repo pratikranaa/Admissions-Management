@@ -1,15 +1,31 @@
 // pages/index.tsx
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Toaster, toast } from 'react-hot-toast';
 import { FileText, Upload, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import TopLoadingBar from './components/TopLoadingBar';
 import Navbar from './components/Navbar'; // Import the Navbar component
 
-const FileUpload = ({ onFolderUpload, label, files, clearFiles }) => {
-  const handleFileChange = (event) => {
-    const selectedFiles = Array.from(event.target.files);
+interface FileUploadProps {
+  onFolderUpload: (files: File[]) => void;
+  label: string;
+  files: File[];
+  clearFiles: () => void;
+}
+
+const FileUpload: React.FC<FileUploadProps> = ({ onFolderUpload, label, files, clearFiles }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.setAttribute('webkitdirectory', 'true');
+      inputRef.current.setAttribute('directory', 'true');
+    }
+  }, []);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files || []);
     onFolderUpload(selectedFiles);
   };
 
@@ -19,8 +35,7 @@ const FileUpload = ({ onFolderUpload, label, files, clearFiles }) => {
         <>
           <input
             type="file"
-            webkitdirectory="true"
-            directory="true"
+            ref={inputRef}
             multiple
             onChange={handleFileChange}
             className="hidden"
@@ -54,7 +69,11 @@ const FileUpload = ({ onFolderUpload, label, files, clearFiles }) => {
   );
 };
 
-const ProgressBar = ({ progress }) => (
+interface ProgressBarProps {
+  progress: number;
+}
+
+const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => (
   <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
     <motion.div
       className="bg-blue-600 h-2.5 rounded-full"
@@ -65,7 +84,12 @@ const ProgressBar = ({ progress }) => (
   </div>
 );
 
-const ResultItem = ({ student, result }) => (
+interface ResultItemProps {
+  student: string;
+  result: string;
+}
+
+const ResultItem: React.FC<ResultItemProps> = ({ student, result }) => (
   <div className="flex items-center space-x-2 py-2">
     {result === 'Verified' ? (
       <CheckCircle className="text-green-500" />
@@ -76,15 +100,20 @@ const ResultItem = ({ student, result }) => (
   </div>
 );
 
-const Home = () => {
-  const [transcripts, setTranscripts] = useState([]);
-  const [forms, setForms] = useState([]);
-  const [progress, setProgress] = useState(0);
-  const [processing, setProcessing] = useState(false);
-  const [results, setResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  const [progressText, setProgressText] = useState('');
-  const abortControllerRef = useRef(null);
+interface Result {
+  student: string;
+  result: string;
+}
+
+const Home: React.FC = () => {
+  const [transcripts, setTranscripts] = useState<File[]>([]);
+  const [forms, setForms] = useState<File[]>([]);
+  const [progress, setProgress] = useState<number>(0);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [results, setResults] = useState<Result[]>([]);
+  const [showResults, setShowResults] = useState<boolean>(false);
+  const [progressText, setProgressText] = useState<string>('');
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleVerify = async () => {
     if (transcripts.length === 0 || forms.length === 0) {
@@ -111,14 +140,14 @@ const Home = () => {
         signal: abortControllerRef.current.signal,
       });
 
-      const reader = response.body.getReader();
+      const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
       let processedFiles = 0;
       const totalFiles = transcripts.length;
 
       while (true) {
-        const { done, value } = await reader.read();
+        const { done, value } = await reader?.read() || { done: true, value: undefined };
         if (done) break;
 
         const chunk = decoder.decode(value);
@@ -148,11 +177,16 @@ const Home = () => {
         }
       }
     } catch (error) {
-      if (error.name === 'AbortError') {
-        console.log('Request canceled:', error.message);
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          console.log('Request canceled:', error.message);
+        } else {
+          console.error('Error:', error);
+          toast.error('An error occurred during verification.');
+        }
       } else {
-        console.error('Error:', error);
-        toast.error('An error occurred during verification.');
+        console.error('Unknown error:', error);
+        toast.error('An unknown error occurred during verification.');
       }
       setProcessing(false);
     }
@@ -170,8 +204,13 @@ const Home = () => {
       link.click();
       link.remove();
     } catch (error) {
-      console.error('Error exporting CSV:', error);
-      toast.error('Error exporting CSV file.');
+      if (error instanceof Error) {
+        console.error('Error exporting CSV:', error);
+        toast.error('Error exporting CSV file.');
+      } else {
+        console.error('Unknown error:', error);
+        toast.error('An unknown error occurred while exporting CSV.');
+      }
     }
   };
 
@@ -186,7 +225,11 @@ const Home = () => {
       await fetch('http://10.1.45.66:5500/cancel', { method: 'POST' });
       console.log('Cancellation request sent to server');
     } catch (error) {
-      console.error('Error sending cancellation request:', error);
+      if (error instanceof Error) {
+        console.error('Error sending cancellation request:', error);
+      } else {
+        console.error('Unknown error:', error);
+      }
     }
 
     // Reset the frontend state

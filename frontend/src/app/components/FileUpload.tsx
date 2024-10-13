@@ -1,5 +1,5 @@
 // components/FileUpload.tsx
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, ChangeEvent } from 'react';
 import { Upload, Trash2 } from 'lucide-react';
 
 interface FileUploadProps {
@@ -19,7 +19,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFolderUpload, label, files, c
     }
   }, []);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files || []);
     onFolderUpload(selectedFiles);
   };
@@ -36,10 +36,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFolderUpload, label, files, c
             className="hidden"
             id={`file-upload-${label}`}
           />
-          <label
-            htmlFor={`file-upload-${label}`}
-            className="cursor-pointer"
-          >
+          <label htmlFor={`file-upload-${label}`} className="cursor-pointer">
             <Upload className="mx-auto h-12 w-12 text-gray-400" />
             <p className="mt-1">Drop {label} folder here or click to upload</p>
           </label>
