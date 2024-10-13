@@ -60,7 +60,7 @@ def process_files(transcript_folder, forms_folder):
             elif ': OCR processing completed' in update:
                 parts = update.split(': ')
                 student = parts[0]
-                progress = (processed_files / total_files) * 100
+                progress = (processed_files + 0.5 / total_files) * 100
                 response = json.dumps({
                     'status': 'Processing',
                     'message': update,
