@@ -52,9 +52,16 @@ def process_files(transcript_folder, forms_folder):
                     'status': 'Result',
                     'student': student,
                     'result': result,
-                    'progress': progress / 2  # OCR progress (50% of total)
+                    'progress': progress
                 }) + '\n'
                 print(f"Debug: Sending result response: {response}")
+                yield response
+            elif ': OCR processing completed' in update:
+                response = json.dumps({
+                    'status': 'Processing',
+                    'message': update
+                }) + '\n'
+                print(f"Debug: Sending OCR completed response: {response}")
                 yield response
             else:
                 response = json.dumps({

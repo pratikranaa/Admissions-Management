@@ -97,8 +97,7 @@ def process_candidate(candidate, transcript_path, form_path, output_folder):
     print(f"Processing candidate: {candidate}")
     yield f"Processing candidate: {candidate}"
     
-        # Ensure the output directory exists
-    # os.makedirs(output_folder, exist_ok=True)
+    # Ensure the output directory exists
     output_path = os.path.join(output_folder, f"{candidate}.txt")
 
     # Process transcript PDF
