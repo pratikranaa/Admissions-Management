@@ -5,7 +5,7 @@ const Navbar = () => {
     <nav className="bg-white border-gray-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a
-          href="https://linkedin.com/in/ranapratik/"
+          href="https://proofie.vercel.app/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
@@ -17,7 +17,7 @@ const Navbar = () => {
             type="button"
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
-            <a href="mailto:pratikrana859@gmail.com">Contact Creators</a>
+            <a href="https://proofie.vercel.app/">Contact the Creators</a>
           </button>
           <button
             data-collapse-toggle="navbar-cta"
@@ -60,18 +60,18 @@ const Navbar = () => {
             </li>
             <li>
               <a
-                href="https://github.com/pratikranaa/ImageCraft"
+                href="https://proofie.vercel.app/"
                 className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
               >
-                Github for the Project
+                Documentation
               </a>
             </li>
             <li>
               <a
-                href="https://linkedin.com/in/ranapratik/"
+                href="https://proofie.vercel.app/"
                 className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
               >
-                Creator&apos;Linkedin
+                About Us
               </a>
             </li>
           </ul>
