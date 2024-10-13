@@ -56,7 +56,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFolderUpload, label, files, c
       ) : (
         <div className="text-left">
           <p className="font-bold">{label} ({files.length} files)</p>
-          <div className="max-h-32 overflow-y-auto">
+          <div className="max-h-28 overflow-y-auto">
             <ul className="list-disc list-inside">
               {files.map((file, index) => (
                 <li key={index}>{file.name}</li>
