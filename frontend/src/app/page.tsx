@@ -1,5 +1,5 @@
-// pages/index.tsx
-"use client";
+"use client"
+
 import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Toaster, toast } from 'react-hot-toast';
@@ -12,21 +12,28 @@ interface FileUploadProps {
   label: string;
   files: File[];
   clearFiles: () => void;
+  inputRef: React.RefObject<HTMLInputElement>;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFolderUpload, label, files, clearFiles }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
+const FileUpload: React.FC<FileUploadProps> = ({ onFolderUpload, label, files, clearFiles, inputRef }) => {
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.setAttribute('webkitdirectory', 'true');
       inputRef.current.setAttribute('directory', 'true');
     }
-  }, []);
+  }, [inputRef]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files || []);
     onFolderUpload(selectedFiles);
+  };
+
+  const handleClearFiles = () => {
+    clearFiles();
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+    window.location.reload(); // Refresh the page
   };
 
   return (
@@ -57,7 +64,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFolderUpload, label, files, c
             </ul>
           </div>
           <button
-            onClick={clearFiles}
+            onClick={handleClearFiles}
             className="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded transition-colors duration-200 flex items-center"
           >
             <Trash2 className="mr-1" />
@@ -114,6 +121,8 @@ const Home: React.FC = () => {
   const [showResults, setShowResults] = useState<boolean>(false);
   const [progressText, setProgressText] = useState<string>('');
   const abortControllerRef = useRef<AbortController | null>(null);
+  const transcriptInputRef = useRef<HTMLInputElement>(null);
+  const formInputRef = useRef<HTMLInputElement>(null);
 
   const handleVerify = async () => {
     if (transcripts.length === 0 || forms.length === 0) {
@@ -134,7 +143,7 @@ const Home: React.FC = () => {
     abortControllerRef.current = new AbortController();
 
     try {
-      const response = await fetch('http://10.1.45.66:5500/verify', {
+      const response = await fetch('https://10.1.45.66:5500/verify', {
         method: 'POST',
         body: formData,
         signal: abortControllerRef.current.signal,
@@ -194,7 +203,7 @@ const Home: React.FC = () => {
 
   const handleExportCSV = async () => {
     try {
-      const response = await fetch('http://10.1.45.66:5500/export-csv');
+      const response = await fetch('https://10.1.45.66:5500/export-csv');
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -222,7 +231,7 @@ const Home: React.FC = () => {
     }
 
     try {
-      await fetch('http://10.1.45.66:5500/cancel', { method: 'POST' });
+      await fetch('https://10.1.45.66:5500/cancel', { method: 'POST' });
       console.log('Cancellation request sent to server');
     } catch (error) {
       if (error instanceof Error) {
@@ -239,14 +248,29 @@ const Home: React.FC = () => {
     setResults([]);
     setShowResults(false);
     setProgressText('');
+    if (transcriptInputRef.current) {
+      transcriptInputRef.current.value = '';
+    }
+    if (formInputRef.current) {
+      formInputRef.current.value = '';
+    }
+    window.location.reload(); // Refresh the page
   };
 
   const clearTranscripts = () => {
     setTranscripts([]);
+    if (transcriptInputRef.current) {
+      transcriptInputRef.current.value = '';
+    }
+    window.location.reload(); // Refresh the page
   };
 
   const clearForms = () => {
     setForms([]);
+    if (formInputRef.current) {
+      formInputRef.current.value = '';
+    }
+    window.location.reload(); // Refresh the page
   };
 
   return (
@@ -259,8 +283,8 @@ const Home: React.FC = () => {
           <div className="space-y-4 flex flex-col items-center w-full">
             <h2 className="text-xl font-bold mb-2">Upload Files</h2>
             <p className="text-sm text-gray-400 mb-4 text-center">Please upload the transcripts and forms folders to start the verification process.</p>
-            <FileUpload onFolderUpload={setTranscripts} label="transcripts" files={transcripts} clearFiles={clearTranscripts} />
-            <FileUpload onFolderUpload={setForms} label="forms" files={forms} clearFiles={clearForms} />
+            <FileUpload onFolderUpload={setTranscripts} label="transcripts" files={transcripts} clearFiles={clearTranscripts} inputRef={transcriptInputRef} />
+            <FileUpload onFolderUpload={setForms} label="forms" files={forms} clearFiles={clearForms} inputRef={formInputRef} />
             <button
               onClick={handleVerify}
               disabled={processing}
