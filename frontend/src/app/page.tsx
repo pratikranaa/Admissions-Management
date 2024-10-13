@@ -166,7 +166,13 @@ const Home: React.FC = () => {
           const data = JSON.parse(line);
           switch (data.status) {
             case 'Processing':
+
               setProgressText(data.message);
+              if (data.message.includes('OCR processing')) {
+                setProgress(prev => prev + (50 / totalFiles));
+              } else if (data.message.includes('Verification result')) {
+                setProgress(prev => prev + (50 / totalFiles));
+              }
               break;
             case 'Result':
               setResults(prev => [...prev, { student: data.student, result: data.result }]);
@@ -176,7 +182,6 @@ const Home: React.FC = () => {
               break;
             case 'Completed':
               setProgressText(data.message);
-              setProgress(data.progress);
               setProcessing(false);
               break;
             case 'Cancelled':
