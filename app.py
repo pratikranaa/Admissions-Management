@@ -52,17 +52,23 @@ def process_files(transcript_folder, forms_folder):
                     'status': 'Result',
                     'student': student,
                     'result': result,
-                    'progress': progress
+                    'progress': progress / 2
                 }) + '\n'
                 print(f"Debug: Sending result response: {response}")
                 yield response
+                
             elif ': OCR processing completed' in update:
+                parts = update.split(': ')
+                student = parts[0]
+                progress = (processed_files / total_files) * 100
                 response = json.dumps({
                     'status': 'Processing',
-                    'message': update
+                    'message': update,
+                    'progress': progress / 2
                 }) + '\n'
                 print(f"Debug: Sending OCR completed response: {response}")
                 yield response
+                
             else:
                 response = json.dumps({
                     'status': 'Processing',
@@ -169,4 +175,4 @@ def export_csv():
     return response
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5500, debug=True)
+    app.run(host='0.0.0.0', port=5500, ssl_context=('/home/deepan/ssl_certificates/server.crt', '/home/deepan/ssl_certificates/server.key'))

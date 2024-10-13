@@ -176,6 +176,7 @@ const Home: React.FC = () => {
               break;
             case 'Completed':
               setProgressText(data.message);
+              setProgress(data.progress);
               setProcessing(false);
               break;
             case 'Cancelled':
