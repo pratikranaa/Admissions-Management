@@ -7,6 +7,8 @@ import { FileText, Upload, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import TopLoadingBar from './components/TopLoadingBar';
 import Navbar from './components/Navbar'; // Import the Navbar component
 
+const API_URL = 'https://10.1.45.66:5500'; // Define the API URL variable
+
 interface FileUploadProps {
   onFolderUpload: (files: File[]) => void;
   label: string;
@@ -143,7 +145,7 @@ const Home: React.FC = () => {
     abortControllerRef.current = new AbortController();
 
     try {
-      const response = await fetch('https://10.1.45.66:5500/verify', {
+      const response = await fetch(`${API_URL}/verify`, {
         method: 'POST',
         body: formData,
         signal: abortControllerRef.current.signal,
@@ -207,7 +209,7 @@ const Home: React.FC = () => {
 
   const handleExportCSV = async () => {
     try {
-      const response = await fetch('https://10.1.45.66:5500/export-csv');
+      const response = await fetch(`${API_URL}/export-csv`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -235,7 +237,7 @@ const Home: React.FC = () => {
     }
 
     try {
-      await fetch('https://10.1.45.66:5500/cancel', { method: 'POST' });
+      await fetch(`${API_URL}/cancel`, { method: 'POST' });
       console.log('Cancellation request sent to server');
     } catch (error) {
       if (error instanceof Error) {
@@ -316,8 +318,10 @@ const Home: React.FC = () => {
               >
                 <h2 className="text-xl font-bold mb-4">Verification Progress</h2>
                 <ProgressBar progress={progress} />
-                <p className="mt-2 text-center">{progressText}</p>
-                <div className="mt-4 max-h-60 overflow-y-auto">
+                <div className="mt-2 text-center flex flex-col items-center justify-center relative">
+                  <p>{progressText}</p>
+                </div>
+                <div className="mt-4 max-h-50 overflow-y-auto">
                   {results.map((result, index) => (
                     <ResultItem key={index} student={result.student} result={result.result} />
                   ))}

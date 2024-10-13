@@ -7,6 +7,7 @@ from modules.ocr_module import process_candidate_pdfs
 import csv
 from io import StringIO
 from flask import Flask, request, render_template, Response, jsonify
+import threading
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
@@ -52,7 +53,7 @@ def process_files(transcript_folder, forms_folder):
                     'status': 'Result',
                     'student': student,
                     'result': result,
-                    'progress': progress / 2
+                    'progress': progress
                 }) + '\n'
                 print(f"Debug: Sending result response: {response}")
                 yield response
@@ -60,11 +61,11 @@ def process_files(transcript_folder, forms_folder):
             elif ': OCR processing completed' in update:
                 parts = update.split(': ')
                 student = parts[0]
-                progress = (processed_files + 0.5 / total_files) * 100
+                progress = ((processed_files + 0.5) / total_files) * 100
                 response = json.dumps({
                     'status': 'Processing',
                     'message': update,
-                    'progress': progress / 2
+                    'progress': progress
                 }) + '\n'
                 print(f"Debug: Sending OCR completed response: {response}")
                 yield response
@@ -142,7 +143,31 @@ def verify():
 def cancel():
     app.cancellation_requested = True
     print("Debug: Cancellation requested")
+    threading.Thread(target=cleanup_files).start()  # Start cleanup in a separate thread
     return jsonify({'status': 'Cancellation requested'})
+
+def cleanup_files():
+    transcript_folder = os.path.join(UPLOAD_FOLDER, 'transcripts')
+    forms_folder = os.path.join(UPLOAD_FOLDER, 'forms')
+
+    # Cleanup: Remove files after processing
+    for folder in [transcript_folder, forms_folder, OCR_RESULTS_FOLDER]:
+        for file in os.listdir(folder):
+            file_path = os.path.join(folder, file)
+            try:
+                os.remove(file_path)
+                print(f"Debug: Removed file: {file_path}")
+            except Exception as e:
+                print(f"Debug: Error removing file {file_path}: {e}")
+
+    # Cleanup: Remove PNG files in the root directory
+    for file in os.listdir('.'):
+        if file.endswith('.png'):
+            try:
+                os.remove(file)
+                print(f"Debug: Removed PNG file: {file}")
+            except Exception as e:
+                print(f"Debug: Error removing PNG file {file}: {e}")
 
 @app.route('/export-csv', methods=['GET'])
 def export_csv():
