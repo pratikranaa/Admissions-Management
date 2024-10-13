@@ -1,7 +1,7 @@
 // pages/index.tsx
 "use client";
 import React, { useState, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Toaster, toast } from 'react-hot-toast';
 import { FileText, Upload, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import TopLoadingBar from './components/TopLoadingBar';
@@ -264,7 +264,7 @@ const Home = () => {
             ) : (
               <div className="bg-gray-900 rounded-lg p-4 text-center w-full">
                 <h2 className="text-xl font-bold mb-2">Verification Status</h2>
-                <p className="text-sm text-gray-400">Upload the required files and click "Verify" to start the verification process.</p>
+                <p className="text-sm text-gray-400">Upload the required files and click &quot;Verify&quot; to start the verification process.</p>
               </div>
             )}
           </div>
